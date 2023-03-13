@@ -4,9 +4,7 @@ import hashlib
 import logging
 import os
 import pathlib
-import subprocess
 import sys
-import tempfile
 
 from lxml import etree
 
@@ -456,7 +454,7 @@ def verify_safe_product(product, manifest_schema=None):
         # check with XML Schema (if the file is an xml file)
         if is_xml(filepath) and data_object['rep']:
             schema = product / data_object['rep']['href']
-            if not schame.exists():
+            if not schema.exists():
                 logging.error(f"schema file '{schema}' does not exist")
                 has_errors = True
             elif not check_file_against_schema(filepath, schema):
