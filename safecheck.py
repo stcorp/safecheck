@@ -299,7 +299,7 @@ builtin_manifest_schema = """<?xml version="1.0"?>
 
 
 def check_file_against_schema(xmlfile, schema):
-    if schema.startswith('<?xml'):
+    if isinstance(schema, str) and schema.startswith('<?xml'):
         xmlschema = etree.XMLSchema(etree.fromstring(schema))
         schema = "built-in schema"
     else:
