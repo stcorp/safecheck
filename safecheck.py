@@ -303,8 +303,16 @@ def check_file_against_schema(xmlfile, schema):
         xmlschema = etree.XMLSchema(etree.fromstring(schema))
         schema = "built-in schema"
     else:
-        xmlschema = etree.XMLSchema(etree.parse(os.fspath(schema)).getroot())
+        try:
+            etree.clear_error_log()
+            xmlschema = etree.XMLSchema(etree.parse(os.fspath(schema)).getroot())
+        except etree.Error as exc:
+            logger.error(f"could not parse schema '{schema}'")
+            for error in exc.error_log:
+                logger.error(f"{error.filename}:{error.line}: {error.message}")
+            return False
     try:
+        etree.clear_error_log()
         xmlschema.assertValid(etree.parse(os.fspath(xmlfile)))
     except etree.DocumentInvalid as exc:
         logger.error(f"could not verify '{xmlfile}' against schema '{schema}'")
