@@ -374,9 +374,6 @@ def verify_safe_product(product, manifest_schema=None):
 
     # find list of files in product
     files = [item for item in product.rglob("*") if item.is_file()]
-    if manifestfile not in files:
-        logger.error("could not find 'manifest.safe' in directory listing of product")
-        return 2
     files.remove(manifestfile)
 
     # check files that are referenced in manifest file
