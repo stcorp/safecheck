@@ -299,12 +299,20 @@ builtin_manifest_schema = """<?xml version="1.0"?>
 
 
 def check_file_against_schema(xmlfile, schema):
-    if schema.startswith('<?xml'):
+    if isinstance(schema, str) and schema.startswith('<?xml'):
         xmlschema = etree.XMLSchema(etree.fromstring(schema))
         schema = "built-in schema"
     else:
-        xmlschema = etree.XMLSchema(etree.parse(os.fspath(schema)).getroot())
+        try:
+            etree.clear_error_log()
+            xmlschema = etree.XMLSchema(etree.parse(os.fspath(schema)).getroot())
+        except etree.Error as exc:
+            logger.error(f"could not parse schema '{schema}'")
+            for error in exc.error_log:
+                logger.error(f"{error.filename}:{error.line}: {error.message}")
+            return False
     try:
+        etree.clear_error_log()
         xmlschema.assertValid(etree.parse(os.fspath(xmlfile)))
     except etree.DocumentInvalid as exc:
         logger.error(f"could not verify '{xmlfile}' against schema '{schema}'")
@@ -374,9 +382,6 @@ def verify_safe_product(product, manifest_schema=None):
 
     # find list of files in product
     files = [item for item in product.rglob("*") if item.is_file()]
-    if manifestfile not in files:
-        logger.error("could not find 'manifest.safe' in directory listing of product")
-        return 2
     files.remove(manifestfile)
 
     # check files that are referenced in manifest file
