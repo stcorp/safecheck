@@ -95,10 +95,9 @@ def check_manifest_file(file, schema=None, mission=None):
         if mission == 'S1':
             xsd_name = 's1_buildin_manifest.xsd'
             schema = os.path.join(os.path.dirname(__file__), 'xsd', xsd_name)
-
         elif mission == 'S2':
             xsd_name = 's2_buildin_manifest.xsd'
-            schema = '/home/ghajduch/Documents/2023/2023-03/S2/S2-PDGS-TAS-DI-PSD-V14.9_SAFE/resources/xsd/int/esa/safe/sentinel/1.1/xfdu.xsd'
+            schema = os.path.join(os.path.dirname(__file__), 'xsd', xsd_name)
     return check_file_against_schema(file, schema)
 
 
