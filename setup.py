@@ -6,7 +6,8 @@ setup(
     description='SAFE Internal Consistency Checker',
     author='S[&]T',
     license='BSD',
-    py_modules=['safecheck'],
+    packages=['safecheck'],
     entry_points={'console_scripts': ['safecheck = safecheck:main']},
     install_requires=['lxml'],
+    package_data={"safecheck": ["xsd/*.xsd"]}
 )
