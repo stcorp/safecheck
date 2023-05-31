@@ -5,6 +5,7 @@ import logging
 import os
 import pathlib
 import sys
+from importlib import resources
 
 from lxml import etree
 
@@ -29,8 +30,6 @@ included in the manifest file are also performed.
 """
 
 NSXFDU = '{urn:ccsds:schema:xfdu:1}'
-
-builtin_manifest_schema = """"""
 
 
 def check_file_against_schema(xmlfile, schema):
@@ -90,14 +89,18 @@ def s1_check_product_crc(product, manifestfile):
     return True
 
 
+def get_default_manifest_schema(mission: str) -> str:
+    path = f"xsd/{mission.lower()}_buildin_manifest.xsd"
+    resource = resources.files(__package__).joinpath(path)
+    if resource.exists():
+        return resource.read_text()
+    else:
+        raise FileNotFoundError(f"resource not found: {path!r}")
+
+
 def check_manifest_file(file, schema=None, mission=None):
     if schema is None:
-        if mission == 'S1':
-            xsd_name = 's1_buildin_manifest.xsd'
-            schema = os.path.join(os.path.dirname(__file__), 'xsd', xsd_name)
-        elif mission == 'S2':
-            xsd_name = 's2_buildin_manifest.xsd'
-            schema = os.path.join(os.path.dirname(__file__), 'xsd', xsd_name)
+        schema = get_default_manifest_schema(mission)
     return check_file_against_schema(file, schema)
 
 
