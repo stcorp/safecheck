@@ -7,7 +7,7 @@ setup(
     author='S[&]T',
     license='BSD',
     packages=['safecheck'],
-    entry_points={'console_scripts': ['safecheck = safecheck:main']},
+    entry_points={'console_scripts': ['safecheck = safecheck.safecheck:main']},
     install_requires=['lxml'],
     package_data={"safecheck": ["xsd/*.xsd"]}
 )
