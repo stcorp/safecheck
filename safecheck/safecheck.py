@@ -94,7 +94,7 @@ def s1_check_product_crc(product, manifestfile):
 
 
 def get_default_manifest_schema(mission: str) -> str:
-    path = f"xsd/{mission.lower()}_buildin_manifest.xsd"
+    path = f"xsd/{mission.lower()}_builtin_manifest.xsd"
     resource = resources.files(__package__).joinpath(path)
     if resource.exists():
         return resource.read_text()
