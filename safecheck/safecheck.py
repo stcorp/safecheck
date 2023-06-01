@@ -82,7 +82,11 @@ def s1_check_product_crc(product, manifestfile):
     # Standard products the CRC is the last 4 chararcters in the productname, before the .SAFE extension
     # This is as well the 9th subpart of product name while splitting using '_'
     # On GRD/COG products, an additional '_COG' is added in product name
-    actual_crc = pathlib.Path(product).stem.split('_')[8]
+    stem = pathlib.Path(product).stem
+    if stem.endswith("_COG"):
+        stem = stem[:-4]
+    actual_crc = stem[-4:]
+
     if expected_crc != actual_crc:
         logger.warning(f"crc in product name '{actual_crc}' does not match crc of manifest file '{expected_crc}'")
         return False
