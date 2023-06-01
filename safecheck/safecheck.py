@@ -34,7 +34,7 @@ NSXFDU = '{urn:ccsds:schema:xfdu:1}'
 
 def check_file_against_schema(xmlfile, schema):
     if isinstance(schema, str) and schema.startswith('<?xml'):
-        xmlschema = etree.XMLSchema(etree.fromstring(schema))
+        xmlschema = etree.XMLSchema(etree.fromstring(schema.encode("utf8")))
         schema = "built-in schema"
     else:
         try:
