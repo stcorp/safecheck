@@ -453,21 +453,21 @@ def verify_safe_product(product, manifest_schema=None):
         # check md5sum
         checksum = md5sum(filepath)
         if checksum != data_object['checksum']:
-            logging.error(f"checksum for '{filepath}' ({checksum}) does not match checksum in manifest.safe "
-                          f"({data_object['checksum']})")
+            logger.error(f"checksum for '{filepath}' ({checksum}) does not match checksum in manifest.safe "
+                         f"({data_object['checksum']})")
             has_errors = True
         # check with XML Schema (if the file is an xml file)
         if is_xml(filepath) and data_object['rep']:
             schema = product / data_object['rep']['href']
             if not schema.exists():
-                logging.error(f"schema file '{schema}' does not exist")
+                logger.error(f"schema file '{schema}' does not exist")
                 has_errors = True
             elif not check_file_against_schema(filepath, schema):
                 has_errors = True
 
     # Report on files in the SAFE package that are not referenced by the manifset.safe file
     for file in files:
-        logging.warning(f"file '{file}' found in product but not included in manifest.safe")
+        logger.warning(f"file '{file}' found in product but not included in manifest.safe")
         has_warnings = True
 
     if has_errors:
