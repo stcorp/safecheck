@@ -505,7 +505,7 @@ def main():
 
     args = parser.parse_args(unused_args)
 
-    logger.setLevel('ERROR' if args.quiet else 'INFO')
+    logging.getLogger().setLevel('ERROR' if args.quiet else 'INFO')
     try:
         return_code = 0
         for arg in args.products:
