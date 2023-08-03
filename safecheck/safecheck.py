@@ -1,22 +1,5 @@
-import argparse
-import binascii
-import hashlib
-import logging
-import os
-import pathlib
-import sys
-from importlib import resources
-
-from lxml import etree
-
-
-logger = logging.getLogger(__name__)
-
-
-__copyright__ = 'Copyright (C) 2011-2023 S[&]T, The Netherlands.'
-__version__ = '3.0'
-
-"""Perform consistency checks on SAFE products.
+"""
+Perform consistency checks on SAFE products.
 
 Check the contents of the SAFE products against information included in
 the manifest file, and also perform checks on the components size and
@@ -28,6 +11,22 @@ All XML files included in the product are checked against their schema
 Additional checks on consistency between the product name and information
 included in the manifest file are also performed.
 """
+
+import argparse
+import binascii
+import hashlib
+import logging
+import os
+import pathlib
+import sys
+from importlib import resources
+
+from lxml import etree
+
+logger = logging.getLogger(__name__)
+
+__copyright__ = 'Copyright (C) 2011-2023 S[&]T, The Netherlands.'
+__version__ = '3.0'
 
 NSXFDU = '{urn:ccsds:schema:xfdu:1}'
 
@@ -247,7 +246,8 @@ def main():
     version_parser = argparse.ArgumentParser(add_help=False)
     version_parser.add_argument('--version', action='store_true', help='output version information and exit')
 
-    parser = argparse.ArgumentParser(prog='safecheck', description=__doc__, parents=[version_parser])
+    parser = argparse.ArgumentParser(prog='safecheck', description=__doc__, parents=[version_parser],
+                                     formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('-q', '--quiet', action='store_true',
                         help='suppress standard output messages and warnings, only errors are printed to screen')
     parser.add_argument('-s', '--schema', help='path to the XML schema file for the product manifest')
