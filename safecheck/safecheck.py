@@ -94,11 +94,11 @@ def s1_check_product_crc(product, manifestfile):
 
 def get_default_manifest_schema(mission: str) -> str:
     path = f"xsd/{mission.lower()}_builtin_manifest.xsd"
-    resource = resources.files(__package__).joinpath(path)
-    if resource.exists():
-        return resource.read_text()
-    else:
-        raise FileNotFoundError(f"resource not found: {path!r}")
+    with resources.as_file(resources.files(__package__).joinpath(path)) as resource:
+        if resource.exists():
+            return resource.read_text()
+        else:
+            raise FileNotFoundError(f"resource not found: {path!r}")
 
 
 def check_manifest_file(file, schema=None, mission=None):
