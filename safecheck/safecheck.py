@@ -78,9 +78,8 @@ def s1_check_product_crc(product, manifestfile):
     Only applies to S1 products
     """
     expected_crc = format(binascii.crc_hqx(pathlib.Path(manifestfile).read_bytes(), 0xFFFF), '04X')
-    # Standard products the CRC is the last 4 chararcters in the productname, before the .SAFE extension
-    # This is as well the 9th subpart of product name while splitting using '_'
-    # On GRD/COG products, an additional '_COG' is added in product name
+    # For standard products the CRC is the last 4 chararcters in the productname (= filename without .SAFE extension).
+    # For GRD/COG products, we also need to remove an additional '_COG' postfix from the productname.
     stem = pathlib.Path(product).stem
     if stem.endswith("_COG"):
         stem = stem[:-4]
