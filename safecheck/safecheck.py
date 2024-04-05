@@ -152,6 +152,12 @@ def verify_safe_product(product, manifest_schema=None):
             filepath = product / href
             if filepath in files:
                 files.remove(filepath)
+        else:
+            reference = metadata_object.find('metadataReference')
+            if reference is not None:
+                filepath = product / reference.get('href')
+                if filepath in files:
+                    files.remove(filepath)
 
     if mission == 'S1':
         information_package_map = manifest.find('informationPackageMap')
