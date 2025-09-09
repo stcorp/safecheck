@@ -20,7 +20,9 @@ import os
 import pathlib
 import sys
 from importlib import resources
+import json
 
+import jsonschema
 from lxml import etree
 
 logger = logging.getLogger(__name__)
@@ -31,7 +33,31 @@ __version__ = '3.0'
 NSXFDU = '{urn:ccsds:schema:xfdu:1}'
 
 
-def check_file_against_schema(xmlfile, schema):
+def check_json_file_against_schema(jsonfile, schemafile):
+    try:
+        with open(os.fspath(schemafile)) as json_data:
+            schema = json.load(json_data)
+    except json.JSONDecodeError as exc:
+        logger.error(f"could not parse json schema '{schemafile}'")
+        logger.error(f"{schemafile}:{exc.lineno}: {exc.msg}")
+        return False
+    try:
+        with open(os.fspath(jsonfile)) as json_data:
+            doc = json.load(json_data)
+    except json.JSONDecodeError as exc:
+        logger.error(f"could not parse json file '{jsonfile}'")
+        logger.error(f"{schemafile}:{exc.lineno}: {exc.msg}")
+        return False
+    try:
+        jsonschema.validate(doc, schema)
+    except jsonschema.ValidationError as exc:
+        logger.error(f"could not verify '{jsonfile}' against schema '{schemafile}' ({exc.message})")
+        return False
+    logger.debug(f"file '{jsonfile}' valid according to schema '{schema}'")
+    return True
+
+
+def check_xml_file_against_schema(xmlfile, schema):
     if isinstance(schema, str) and schema.startswith('<?xml'):
         xmlschema = etree.XMLSchema(etree.fromstring(schema.encode("utf8")))
         schema = "built-in schema"
@@ -40,7 +66,7 @@ def check_file_against_schema(xmlfile, schema):
             etree.clear_error_log()
             xmlschema = etree.XMLSchema(etree.parse(os.fspath(schema)).getroot())
         except etree.Error as exc:
-            logger.error(f"could not parse schema '{schema}'")
+            logger.error(f"could not parse xml schema '{schema}'")
             for error in exc.error_log:
                 logger.error(f"{error.filename}:{error.line}: {error.message}")
             return False
@@ -54,6 +80,11 @@ def check_file_against_schema(xmlfile, schema):
         return False
     logger.debug(f"file '{xmlfile}' valid according to schema '{schema}'")
     return True
+
+
+def is_json(filename):
+    filename = pathlib.Path(filename)
+    return filename.suffix.lower() == '.json' and filename.name[0] != "."
 
 
 def is_xml(filename):
@@ -103,7 +134,7 @@ def get_default_manifest_schema(mission: str) -> str:
 def check_manifest_file(file, schema=None, mission=None):
     if schema is None:
         schema = get_default_manifest_schema(mission)
-    return check_file_against_schema(file, schema)
+    return check_xml_file_against_schema(file, schema)
 
 
 def verify_safe_product(product, manifest_schema=None):
@@ -223,8 +254,16 @@ def verify_safe_product(product, manifest_schema=None):
             if not schema.exists():
                 logger.error(f"schema file '{schema}' does not exist")
                 has_errors = True
-            elif not check_file_against_schema(filepath, schema):
+            elif not check_xml_file_against_schema(filepath, schema):
                 has_errors = True
+        if is_json(filepath) and data_object['rep']:
+            schema = product / data_object['rep']['href']
+            if not schema.exists():
+                logger.error(f"schema file '{schema}' does not exist")
+                has_errors = True
+            elif is_json(schema):
+                if not check_json_file_against_schema(filepath, schema):
+                    has_errors = True
 
     # Report on files in the SAFE package that are not referenced by the manifset.safe file
     for file in files:

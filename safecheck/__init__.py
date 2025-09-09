@@ -2,7 +2,8 @@
 
 from .safecheck import (
     __version__,
-    check_file_against_schema,
+    check_json_file_against_schema,
+    check_xml_file_against_schema,
     s1_check_product_crc,
     get_default_manifest_schema,
     check_manifest_file,
